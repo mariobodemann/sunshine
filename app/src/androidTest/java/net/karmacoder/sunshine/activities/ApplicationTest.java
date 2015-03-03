@@ -1,4 +1,4 @@
-package net.karmacoder.sunshine.sunshine;
+package net.karmacoder.sunshine.activities;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

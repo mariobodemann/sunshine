@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "net.karmacoder.sunshine.sunshine"
+        applicationId "net.karmacoder.sunshine"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
