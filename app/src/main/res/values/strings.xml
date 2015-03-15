@@ -3,4 +3,23 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_refresh_title">Refresh</string>
+    <string name="action_verify_location_title">Check Location on map ...</string>
+    <string name="title_activity_detail">Weather Details</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="preference_location_title">Location</string>
+    <string name="preference_location_key" translateable="false">pref_location_key</string>
+    <string name="preference_location_default" translateable="false">Berlin,de</string>
+    <string name="preference_units_title">Units</string>
+    <string name="preference_units_key" translateable="false">pref_units_key</string>
+    <string name="preference_units_default" translateable="false">metric</string>
+    <string name="action_share">Share …</string>
+    <string name="preference_api_key_default" />
+    <string name="preference_api_key_key">api_key</string>
+    <string name="preference_api_key_title">Api Key</string>
+    <string name="preference_mock_results_key">mocking</string>
+    <string name="preference_mock_results_title">Mock Open Weather Map Results</string>
+    <string-array name="preference_unit_values">
+        <item>metric</item>
+        <item>imperial</item>
+    </string-array>
 </resources>

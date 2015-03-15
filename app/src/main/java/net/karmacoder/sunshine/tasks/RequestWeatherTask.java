@@ -2,6 +2,7 @@ package net.karmacoder.sunshine.tasks;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -18,8 +19,9 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
-public class RequestWeatherTask extends AsyncTask<String, Void, String[]> {
+public class RequestWeatherTask extends AsyncTask<RequestWeatherTask.RequestParameter, Void, String[]> {
     private static final String TAG = RequestWeatherTask.class.getCanonicalName();
 
     private static final String OWM_LIST = "list";
@@ -28,6 +30,20 @@ public class RequestWeatherTask extends AsyncTask<String, Void, String[]> {
     private static final String OWM_MAX = "max";
     private static final String OWM_MIN = "min";
     private static final String OWM_DESCRIPTION = "main";
+
+    private static final int TIMEOUT = (int) TimeUnit.SECONDS.toMicros(1);
+    private static final String[] MOCKED_RESULTS = new String[]{
+            "Today - Something - 10 / 10",
+            "Tomorrow - Something - 10 / 10",
+            "Someday - Something - 10 / 10",
+    };
+
+    public static class RequestParameter {
+        public String location;
+        public String units;
+        public String appid;
+        public boolean mockResults;
+    }
 
     public static interface ResponseListener {
         public void onResponseReturned(String[] response);
@@ -40,16 +56,20 @@ public class RequestWeatherTask extends AsyncTask<String, Void, String[]> {
     }
 
     @Override
-    protected String[] doInBackground(String... params) {
+    protected String[] doInBackground(RequestParameter... params) {
         if (params.length != 1) {
             return null;
         }
 
-        final String postCode = params[0];
+        final RequestParameter requestParameter = params[0];
+        if (requestParameter.mockResults) {
+            return MOCKED_RESULTS;
+        }
+
         String response = null;
         HttpURLConnection urlConnection = null;
         try {
-            urlConnection = createConnection(postCode);
+            urlConnection = createConnection(requestParameter);
             if (urlConnection != null) {
                 urlConnection.connect();
                 response = readResponse(urlConnection);
@@ -72,11 +92,14 @@ public class RequestWeatherTask extends AsyncTask<String, Void, String[]> {
         return null;
     }
 
-    private HttpURLConnection createConnection(String postCode) throws MalformedURLException {
-        final URL url = buildUrl(postCode);
+    private HttpURLConnection createConnection(RequestParameter parameter) throws MalformedURLException {
+        final URL url = buildUrl(parameter);
         HttpURLConnection urlConnection;
         try {
+            Log.d(TAG, "Connecting to " + url.toString());
             urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(TIMEOUT);
+            urlConnection.setReadTimeout(TIMEOUT);
         } catch (IOException e) {
             return null;
         }
@@ -91,20 +114,24 @@ public class RequestWeatherTask extends AsyncTask<String, Void, String[]> {
         return urlConnection;
     }
 
-    private URL buildUrl(String postCode) throws MalformedURLException {
-        final Uri uri = Uri.parse("http://api.openweathermap.org")
+    private URL buildUrl(RequestParameter parameter) throws MalformedURLException {
+        Uri.Builder builder = Uri.parse("http://api.openweathermap.org")
                 .buildUpon()
                 .appendPath("data")
                 .appendPath("2.5")
                 .appendPath("forecast")
                 .appendPath("daily")
-                .appendQueryParameter("q", postCode)
+                .appendQueryParameter("q", parameter.location)
                 .appendQueryParameter("mode", "json")
-                .appendQueryParameter("units", "metric")
-                .appendQueryParameter("cnt", "7")
-                .build();
+                .appendQueryParameter("units", parameter.units)
+                .appendQueryParameter("cnt", "7");
 
-        return new URL(uri.toString());
+        if (!TextUtils.isEmpty(parameter.appid)) {
+            builder.appendQueryParameter("APPID", parameter.appid);
+        }
+
+
+        return new URL(builder.build().toString());
     }
 
     private String readResponse(HttpURLConnection urlConnection) throws IOException {
@@ -157,6 +184,10 @@ public class RequestWeatherTask extends AsyncTask<String, Void, String[]> {
 
     private String[] getWeatherDataFromJson(String forecastJsonStr)
             throws JSONException {
+        if (TextUtils.isEmpty(forecastJsonStr)) {
+            return new String[]{"NO DATA"};
+        }
+
         final JSONObject forecastJson = new JSONObject(forecastJsonStr);
         final JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
         final Time dayTime = new Time();
@@ -196,7 +227,11 @@ public class RequestWeatherTask extends AsyncTask<String, Void, String[]> {
     protected void onPostExecute(String[] response) {
         super.onPostExecute(response);
 
-        if (response != null && mListener != null) {
+        if (mListener != null) {
+            if (response == null) {
+                response = new String[]{"FAILED TO PARSE"};
+            }
+
             mListener.onResponseReturned(response);
         }
     }

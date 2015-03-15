@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_action_refresh"
+        android:title="@string/action_refresh_title"
+        />
+    <item
+        android:id="@+id/menu_action_verify_location"
+        android:title="@string/action_verify_location_title"
+        />
+    <item
+        android:id="@+id/menu_action_settings"
+        android:title="@string/action_settings"
+        />
+</menu>

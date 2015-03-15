@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:id="@+id/preference_location"
+        android:defaultValue="@string/preference_location_default"
+        android:key="@string/preference_location_key"
+        android:title="@string/preference_location_title" />
+
+    <EditTextPreference
+        android:id="@+id/preference_api_key"
+        android:defaultValue="@string/preference_api_key_default"
+        android:key="@string/preference_api_key_key"
+        android:title="@string/preference_api_key_title" />
+
+    <CheckBoxPreference
+        android:id="@+id/preference_mock_results"
+        android:defaultValue="false"
+        android:key="@string/preference_mock_results_key"
+        android:title="@string/preference_mock_results_title" />
+
+    <ListPreference
+        android:defaultValue="@string/preference_units_default"
+        android:entryValues="@array/preference_unit_values"
+        android:entries="@array/preference_unit_values"
+        android:title="@string/preference_units_title"
+        android:key="@string/preference_units_key" />
+
+</PreferenceScreen>
