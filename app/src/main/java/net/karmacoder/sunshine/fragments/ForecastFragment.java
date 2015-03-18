@@ -109,8 +109,10 @@ public class ForecastFragment extends Fragment {
 
     private void verifyLocation() {
         final String preferredLocation = getPreferredLocation();
-        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                "geo:0,0?q=" + preferredLocation));
+        final Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("geo:0,0").buildUpon()
+                    .appendQueryParameter("q", preferredLocation)
+                    .build());
 
         final FragmentActivity activity = getActivity();
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
