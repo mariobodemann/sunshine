@@ -18,8 +18,12 @@
     <string name="preference_api_key_title">Api Key</string>
     <string name="preference_mock_results_key">mocking</string>
     <string name="preference_mock_results_title">Mock Open Weather Map Results</string>
+    <string name="action_enable_stetho">Enable Stetho</string>
+    <string name="preference_unit_metric">metric</string>
+    <string name="preference_unit_imperial">imperial</string>
+
     <string-array name="preference_unit_values">
-        <item>metric</item>
-        <item>imperial</item>
+        <item>@string/preference_unit_metric</item>
+        <item>@string/preference_unit_imperial</item>
     </string-array>
 </resources>

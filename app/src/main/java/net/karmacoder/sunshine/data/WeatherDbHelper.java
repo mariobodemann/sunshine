@@ -18,7 +18,6 @@ package net.karmacoder.sunshine.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import static net.karmacoder.sunshine.data.WeatherContract.LocationEntry;
 import static net.karmacoder.sunshine.data.WeatherContract.WeatherEntry;
@@ -39,12 +38,12 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(createWeatherTable());
-        sqLiteDatabase.execSQL(createLocationTable());
+        createWeatherTable(sqLiteDatabase);
+        createLocationTable(sqLiteDatabase);
     }
 
-    private String createWeatherTable() {
-        return "CREATE TABLE " + WeatherEntry.TABLE_NAME + " ( "
+    private void createWeatherTable(SQLiteDatabase sqLiteDatabase) {
+        sqLiteDatabase.execSQL("CREATE TABLE " + WeatherEntry.TABLE_NAME + " ( "
                 + WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + WeatherEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, "
                 + WeatherEntry.COLUMN_DATE + " INTEGER NOT NULL, "
@@ -68,18 +67,18 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 + WeatherEntry.COLUMN_LOC_KEY
                 + ") "
                 + " ON CONFLICT REPLACE"
-                + ");";
+                + ");");
     }
 
-    private String createLocationTable() {
-        return "CREATE TABLE " + LocationEntry.TABLE_NAME
+    private void createLocationTable(SQLiteDatabase sqLiteDatabase) {
+        sqLiteDatabase.execSQL("CREATE TABLE " + LocationEntry.TABLE_NAME
             + " ("
             + LocationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + LocationEntry.COLUMN_COORDINATE_LATITUDE + " REAL Database SupportNOT NULL, "
+            + LocationEntry.COLUMN_COORDINATE_LATITUDE + " REAL NOT NULL, "
             + LocationEntry.COLUMN_COORDINATE_LONGITUDE + " REAL NOT NULL, "
             + LocationEntry.COLUMN_CITY_NAME + " STRING TEXT NOT NULL, "
             + LocationEntry.COLUMN_LOCATION_SETTING + " STRING TEXT UNIQUE NOT NULL "
-            + " );";
+            + " );");
     }
 
     @Override
