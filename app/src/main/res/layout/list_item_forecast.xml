@@ -8,6 +8,4 @@
     android:gravity="center"
     android:minHeight="?attr/listPreferredItemHeight"
     tools:text="FOOBAR"
-    >
-
-</TextView>
+    />

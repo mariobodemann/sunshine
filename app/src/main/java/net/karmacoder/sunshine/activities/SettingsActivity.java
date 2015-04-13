@@ -1,10 +1,15 @@
 package net.karmacoder.sunshine.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
+
+import net.karmacoder.sunshine.constant.LocalBroadcastAction;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -60,6 +65,14 @@ public class SettingsActivity extends PreferenceActivity
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);
         }
+
+        // check if location was changed, if so update all loaders
+        if (TextUtils.equals(preference.getKey(), getString(R.string.preference_location_key))) {
+            final Intent intent = new Intent();
+            intent.setAction(LocalBroadcastAction.BROADCAST_ACTION_LOCATION_UPDATED);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
+
         return true;
     }
 

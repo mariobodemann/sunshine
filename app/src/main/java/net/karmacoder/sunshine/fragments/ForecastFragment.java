@@ -1,10 +1,18 @@
 package net.karmacoder.sunshine.fragments;
 
+import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -16,64 +24,75 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import net.karmacoder.sunshine.Utility;
 import net.karmacoder.sunshine.activities.DetailActivity;
 import net.karmacoder.sunshine.activities.R;
 import net.karmacoder.sunshine.activities.SettingsActivity;
-import net.karmacoder.sunshine.tasks.RequestWeatherTask;
+import net.karmacoder.sunshine.adapter.ForecastAdapter;
+import net.karmacoder.sunshine.constant.LoaderIds;
+import net.karmacoder.sunshine.constant.LocalBroadcastAction;
+import net.karmacoder.sunshine.data.WeatherContract;
+import net.karmacoder.sunshine.tasks.FetchWeatherTask;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import static net.karmacoder.sunshine.data.WeatherContract.WeatherEntry;
+import static net.karmacoder.sunshine.data.WeatherContract.WeatherEntry.buildWeatherLocationWithDate;
 
-import static net.karmacoder.sunshine.tasks.RequestWeatherTask.RequestParameter;
-
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ForecastFragment.class.getCanonicalName();
 
-    private final ArrayList<String> mWeatherData = new ArrayList<>();
-    private ArrayAdapter<String> mListAdapter;
+    private ForecastAdapter mForecastAdapter;
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        final FragmentActivity activity = getActivity();
+        activity.getLoaderManager().initLoader(LoaderIds.LOADER_MAIN_WEATHER_ID, null, this);
+
+        activity.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateWeather();
+                activity.getLoaderManager().restartLoader(LoaderIds.LOADER_MAIN_WEATHER_ID, null, ForecastFragment.this);
+            }
+        }, new IntentFilter(LocalBroadcastAction.BROADCAST_ACTION_LOCATION_UPDATED));
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        mListAdapter = new ArrayAdapter<String>(getActivity(),
-                R.layout.list_item_forecast, R.id.forecast_item_text, mWeatherData);
-
         final ListView list = (ListView)rootView.findViewById(R.id.forecast_list_view);
-        list.setAdapter(mListAdapter);
+        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        list.setAdapter(mForecastAdapter);
 
         list.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        startDetailsActivity(mListAdapter.getItem(position));
+                        final Cursor cursor = (Cursor) mForecastAdapter.getItem(position);
+                        if (cursor != null) {
+                            startDetailsActivity(cursor);
+                        }
                     }
                 }
         );
-
-        final View emptyView = inflater.inflate(R.layout.forecast_empty_view, list, false);
-        emptyView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startDetailsActivity("CURRENTLY EMPTY");
-            }
-        });
-        list.setEmptyView(emptyView);
 
         setHasOptionsMenu(true);
 
         return rootView;
     }
 
-    private void startDetailsActivity(String forecast) {
+    private void startDetailsActivity(Cursor cursor) {
         final Intent intent = new Intent(getActivity().getApplicationContext(),
                 DetailActivity.class);
-        intent.putExtra(DetailActivity.KEY_FORECAST, forecast);
+        final String location = Utility.getPreferredLocation(getActivity());
+        final long weatherDate = cursor.getLong(WeatherContract.COL_WEATHER_DATE);
+        final Uri uri = buildWeatherLocationWithDate(location, weatherDate);
+        intent.setData(uri);
         startActivity(intent);
     }
 
@@ -123,23 +142,7 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather() {
-        new RequestWeatherTask(new RequestWeatherTask.ResponseListener() {
-            @Override
-            public void onResponseReturned(String[] response) {
-                mWeatherData.clear();
-                Collections.addAll(mWeatherData, response);
-                mListAdapter.notifyDataSetChanged();
-            }
-        }).execute(getRequestParameter());
-    }
-
-    private RequestParameter getRequestParameter() {
-        RequestParameter parameter = new RequestParameter();
-        parameter.location = getPreferredLocation();
-        parameter.units = getParameter(R.string.preference_units_key, R.string.preference_units_default);
-        parameter.appid = getParameter(R.string.preference_api_key_key, R.string.preference_api_key_default);
-        parameter.mockResults = getBooleanParameter(R.string.preference_mock_results_key, false);
-        return parameter;
+        new FetchWeatherTask(getActivity()).execute(Utility.getPreferredLocation(getActivity()));
     }
 
     private String getPreferredLocation() {
@@ -152,8 +155,27 @@ public class ForecastFragment extends Fragment {
         return preferences.getString(getString(keyId), defaultValue);
     }
 
-    private boolean getBooleanParameter(@StringRes int keyId, boolean defaultValue) {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        return preferences.getBoolean(getString(keyId), defaultValue);
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        final String locationSetting = Utility.getPreferredLocation(getActivity());
+        final String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
+        final Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+        return new CursorLoader(getActivity(),
+                weatherForLocationUri,
+                WeatherContract.FORECAST_COLUMNS,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mForecastAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
     }
 }

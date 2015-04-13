@@ -1,6 +1,11 @@
 package net.karmacoder.sunshine.activities;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -9,11 +14,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class DetailActivity extends ActionBarActivity {
+import net.karmacoder.sunshine.Utility;
+import net.karmacoder.sunshine.constant.LoaderIds;
+import net.karmacoder.sunshine.data.WeatherContract;
 
-    public static final String KEY_FORECAST = "FORECAST_KEY";
+public class DetailActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private TextView mTextView;
+    private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +29,8 @@ public class DetailActivity extends ActionBarActivity {
         setContentView(R.layout.activity_detail);
 
         mTextView = (TextView) findViewById(R.id.detail_text);
-        mTextView.setText(getForecastData());
+
+        getLoaderManager().initLoader(LoaderIds.LOADER_DETAIL_WEATHER_ID, null, this);
     }
 
     @Override
@@ -29,20 +38,23 @@ public class DetailActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_details, menu);
 
         final MenuItem shareMenuItem = menu.findItem(R.id.action_details_share);
-        final ShareActionProvider shareActionProvider =
-                (ShareActionProvider)MenuItemCompat.getActionProvider(shareMenuItem);
-
-        final Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/*");
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getForecastData() + " #SunshineApp");
-        shareActionProvider.setShareIntent(shareIntent);
+        mShareActionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(shareMenuItem);
 
         return true;
     }
 
-    private String getForecastData() {
-        return getIntent().getStringExtra(KEY_FORECAST);
+    private void updateShareIntent(String text) {
+        if (mShareActionProvider != null) {
+            final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/*");
+            shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, text + " #SunshineApp");
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }
+
+    private Uri getForecastUri() {
+        return getIntent().getData();
     }
 
     @Override
@@ -56,5 +68,24 @@ public class DetailActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, getForecastUri(), WeatherContract.FORECAST_COLUMNS, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            final String text = Utility.convertCursorRowToUXFormat(this, cursor);
+            mTextView.setText(text);
+            updateShareIntent(text);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 }
