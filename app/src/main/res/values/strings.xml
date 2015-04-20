@@ -1,9 +1,9 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Sunshine</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_refresh_title">Refresh</string>
-    <string name="action_verify_location_title">Check Location on map ...</string>
+    <string name="action_verify_location_title">Check Location on map …</string>
     <string name="title_activity_detail">Weather Details</string>
     <string name="title_activity_settings">Settings</string>
     <string name="preference_location_title">Location</string>
@@ -21,6 +21,21 @@
     <string name="action_enable_stetho">Enable Stetho</string>
     <string name="preference_unit_metric">metric</string>
     <string name="preference_unit_imperial">imperial</string>
+
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="format_full_friendly_date"><xliff:g id="day">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g></string>
+    <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g><xliff:g id="unit"> \u00B0%2$s</xliff:g></string>
+
+    <string name="format_wind_mph">
+        Wind: <xliff:g id="speed">%1$1.0f</xliff:g> mph <xliff:g id="direction">%2$s</xliff:g>
+    </string>
+
+    <string name="format_wind_kmh">
+        Wind: <xliff:g id="speed">%1$1.0f</xliff:g> km/h <xliff:g id="direction">%2$s</xliff:g>
+    </string>
+    <string name="format_pressure">Pressure: <xliff:g id="pressure">%1.0f</xliff:g> hPa</string>
+    <string name="format_humidity">Humidity: <xliff:g id="humidity">%1.0f</xliff:g> %%</string>
 
     <string-array name="preference_unit_values">
         <item>@string/preference_unit_metric</item>

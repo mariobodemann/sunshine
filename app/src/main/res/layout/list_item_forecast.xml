@@ -1,11 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+<net.karmacoder.sunshine.ForecastListItem
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/forecast_item_text"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
+    android:layout_height="wrap_content"
     android:minHeight="?attr/listPreferredItemHeight"
-    tools:text="FOOBAR"
-    />
+    android:padding="20dp"
+    android:background="@drawable/touch_selector"
+    >
+
+    <net.karmacoder.sunshine.MyView
+        android:layout_width="100px"
+        android:layout_height="100px"
+        />
+
+    <ImageView
+        android:id="@+id/forecast_item_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:contentDescription="@null"
+        tools:src="@drawable/ic_rain"
+        />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/forecast_item_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="tomorrow"
+            />
+
+        <TextView
+            android:id="@+id/forecast_item_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="might be weather"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="right"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/forecast_item_temperature_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="45 ℃"
+            />
+
+        <TextView
+            android:id="@+id/forecast_item_temperature_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="1 ℃"
+            />
+    </LinearLayout>
+
+</net.karmacoder.sunshine.ForecastListItem>
