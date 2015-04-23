@@ -6,8 +6,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.karmacoder.sunshine.activities.R;
-
 public class ForecastListItem extends LinearLayout {
     public ForecastListItem(Context context) {
         super(context);

@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 
 import net.karmacoder.sunshine.ForecastListItem;
 import net.karmacoder.sunshine.Utility;
-import net.karmacoder.sunshine.activities.R;
 import net.karmacoder.sunshine.data.WeatherContract;
+import net.karmacoder.sunshine.R;
 
 import static net.karmacoder.sunshine.Utility.formatTemperature;
 
@@ -80,16 +80,13 @@ public class ForecastAdapter extends CursorAdapter {
         String description = cursor.getString(WeatherContract.COL_WEATHER_DESC);
         itemView.descriptionText.setText(description);
 
-        // Read user preference for metric or imperial temperature units
-        boolean isMetric = Utility.isMetric(context);
-
         // Read maxTemperature temperature from cursor
         double maxTemperature = cursor.getDouble(WeatherContract.COL_WEATHER_MAX_TEMP);
-        itemView.maxTextView.setText(formatTemperature(context, maxTemperature, isMetric));
+        itemView.maxTextView.setText(formatTemperature(context, maxTemperature));
 
         // TODO Read minTemperature temperature from cursor
         double minTemperature = cursor.getDouble(WeatherContract.COL_WEATHER_MIN_TEMP);
-        itemView.minTextView.setText(formatTemperature(context, minTemperature, isMetric));
+        itemView.minTextView.setText(formatTemperature(context, minTemperature));
     }
 
     public void setShouldHighlightTodayItem(boolean shouldHighlight) {

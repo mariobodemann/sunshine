@@ -1,5 +1,8 @@
 package net.karmacoder.sunshine.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -13,11 +16,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import net.karmacoder.sunshine.R;
 import net.karmacoder.sunshine.Utility;
 import net.karmacoder.sunshine.data.WeatherContract;
 import net.karmacoder.sunshine.fragments.DetailFragment;
 import net.karmacoder.sunshine.fragments.ForecastFragment;
-import net.karmacoder.sunshine.tasks.FetchWeatherTask;
+import net.karmacoder.sunshine.sync.SunshineSyncAdapter;
 
 import static net.karmacoder.sunshine.data.WeatherContract.WeatherEntry.buildWeatherLocationWithDate;
 
@@ -55,19 +59,10 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        updateWeather();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_action_refresh:
                 updateWeather();
-                return true;
-            case R.id.menu_action_verify_location:
-                verifyLocation();
                 return true;
             case R.id.menu_action_settings:
                 final Intent intent = new Intent(this.getApplicationContext(), SettingsActivity.class);
@@ -79,23 +74,8 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         }
     }
 
-    private void verifyLocation() {
-        final String preferredLocation = getPreferredLocation();
-        final Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("geo:0,0").buildUpon()
-                        .appendQueryParameter("q", preferredLocation)
-                        .build());
-
-        final FragmentActivity activity = this;
-        if (intent.resolveActivity(activity.getPackageManager()) != null) {
-            activity.startActivity(intent);
-        } else {
-            Log.e(TAG, "Could not find an app for locations ...");
-        }
-    }
-
     private void updateWeather() {
-        new FetchWeatherTask(this).execute(Utility.getPreferredLocation(this));
+        SunshineSyncAdapter.syncImmediately(this);
     }
 
     private String getPreferredLocation() {
@@ -118,7 +98,6 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             startDetailsActivity(uri);
         }
     }
-
 
     private Uri getCurrentSelectedItemUri(Cursor cursor) {
         final String location = Utility.getPreferredLocation(this);

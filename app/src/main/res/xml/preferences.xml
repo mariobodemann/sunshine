@@ -13,6 +13,12 @@
         android:title="@string/preference_api_key_title" />
 
     <CheckBoxPreference
+        android:id="@+id/preference_enable_notification"
+        android:defaultValue="@bool/preference_enable_notification_default"
+        android:key="@string/preference_enable_notification_key"
+        android:title="@string/preference_enable_notification_title" />
+
+    <CheckBoxPreference
         android:id="@+id/preference_mock_results"
         android:defaultValue="false"
         android:key="@string/preference_mock_results_key"

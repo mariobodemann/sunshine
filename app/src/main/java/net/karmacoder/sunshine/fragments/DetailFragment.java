@@ -14,9 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import net.karmacoder.sunshine.R;
 
 import net.karmacoder.sunshine.Utility;
-import net.karmacoder.sunshine.activities.R;
 import net.karmacoder.sunshine.constant.LoaderIds;
 
 import static net.karmacoder.sunshine.data.WeatherContract.WeatherEntry;
@@ -98,7 +98,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (activity != null) {
             if (!activity.isDestroyed() && isAdded() && !isDetached()) {
                 final LoaderManager loaderManager = activity.getLoaderManager();
-                if (loaderManager != null) {
+                if (loaderManager != null && loaderManager.getLoader(LoaderIds.LOADER_DETAIL_WEATHER_ID) != null) {
                     loaderManager.restartLoader(LoaderIds.LOADER_DETAIL_WEATHER_ID, null, this);
                 }
             }
@@ -108,16 +108,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private void updateView(Cursor cursor) {
         final FragmentActivity activity = getActivity();
         if (activity != null) {
-            boolean isMetric = Utility.isMetric(activity);
-
             int condition = cursor.getInt(WEATHER_CONDITION_ID);
             mImage.setImageResource(Utility.getArtResourceForWeatherCondition(condition));
 
             mTextDate.setText(Utility.getDayName(activity, cursor.getLong(DATE_INDEX)));
             mTextSummary.setText(cursor.getString(SUMMARY_INDEX));
 
-            mTextTemperatureMax.setText(Utility.formatTemperature(activity, cursor.getDouble(TEMPERATURE_MAX_INDEX), isMetric));
-            mTextTemperatureMin.setText(Utility.formatTemperature(activity, cursor.getDouble(TEMPERATURE_MIN_INDEX), isMetric));
+            mTextTemperatureMax.setText(Utility.formatTemperature(activity, cursor.getDouble(TEMPERATURE_MAX_INDEX)));
+            mTextTemperatureMin.setText(Utility.formatTemperature(activity, cursor.getDouble(TEMPERATURE_MIN_INDEX)));
 
             mTextPressure.setText(Utility.formatPressure(activity, cursor.getDouble(PRESSURE_INDEX)));
             mTextWind.setText(Utility.getFormattedWind(activity, cursor.getFloat(WIND_SPEED_INDEX), cursor.getFloat(WIND_DIRECTION_INDEX)));

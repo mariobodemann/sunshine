@@ -21,9 +21,6 @@ import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
 
-import net.karmacoder.sunshine.activities.DetailActivity;
-import net.karmacoder.sunshine.activities.R;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,14 +44,14 @@ public class Utility {
                 .equals(context.getString(R.string.preference_unit_metric));
     }
 
-    public static String formatTemperature(Context context, double temperature, boolean isMetric) {
+    public static String formatTemperature(Context context, double temperature) {
         double temp;
-        if ( !isMetric ) {
+        if ( !isMetric(context) ) {
             temp = 9*temperature/5+32;
         } else {
             temp = temperature;
         }
-        return context.getString(R.string.format_temperature, temp, isMetric ? "C" : "F");
+        return context.getString(R.string.format_temperature, temp, isMetric(context) ? "C" : "F");
     }
 
     public static String formatDate(long dateInMillis) {
@@ -67,7 +64,7 @@ public class Utility {
      */
     private static String formatHighLows(Context context, double high, double low) {
         boolean isMetric = Utility.isMetric(context);
-        String highLowStr = Utility.formatTemperature(context, high, isMetric) + "/" + Utility.formatTemperature(context, low, isMetric);
+        String highLowStr = Utility.formatTemperature(context, high) + "/" + Utility.formatTemperature(context, low);
         return highLowStr;
     }
 

@@ -16,12 +16,15 @@
     <string name="preference_api_key_default" />
     <string name="preference_api_key_key">api_key</string>
     <string name="preference_api_key_title">Api Key</string>
+    <string name="preference_enable_notification_key">enable_notifications</string>
+    <string name="preference_enable_notification_title">Enable Notifications</string>
     <string name="preference_mock_results_key">mocking</string>
     <string name="preference_mock_results_title">Mock Open Weather Map Results</string>
     <string name="action_enable_stetho">Enable Stetho</string>
     <string name="preference_unit_metric">metric</string>
     <string name="preference_unit_imperial">imperial</string>
-
+    <string name="sync_account_type">sunshine.example.com</string>
+    <string name="content_authority">com.example.android.sunshine.app</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="format_full_friendly_date"><xliff:g id="day">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g></string>
@@ -36,6 +39,8 @@
     </string>
     <string name="format_pressure">Pressure: <xliff:g id="pressure">%1.0f</xliff:g> hPa</string>
     <string name="format_humidity">Humidity: <xliff:g id="humidity">%1.0f</xliff:g> %%</string>
+    <string name="pref_last_notification">last_notification</string>
+    <string name="format_notification">Forecast: <xliff:g id="condition">%1$s</xliff:g> High: <xliff:g id="high">%2$s</xliff:g> Low: <xliff:g id="low">%3$s</xliff:g></string>
 
     <string-array name="preference_unit_values">
         <item>@string/preference_unit_metric</item>

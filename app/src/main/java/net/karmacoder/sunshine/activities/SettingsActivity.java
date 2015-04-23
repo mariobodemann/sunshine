@@ -8,6 +8,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import net.karmacoder.sunshine.R;
 
 import net.karmacoder.sunshine.constant.LocalBroadcastAction;
 
